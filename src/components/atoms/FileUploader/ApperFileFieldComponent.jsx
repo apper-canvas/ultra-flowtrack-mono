@@ -9,12 +9,12 @@ const ApperFileFieldComponent = ({ elementId, config }) => {
   
   // Refs for tracking lifecycle and preventing memory leaks
   const mountedRef = useRef(false);
-  const elementIdRef = useRef(null);
+  const elementIdRef = useRef(elementId);
   const existingFilesRef = useRef([]);
 
   // Update elementIdRef when elementId changes
   useEffect(() => {
-    elementIdRef.current = `file-uploader-${elementId}`;
+    elementIdRef.current = elementId;
   }, [elementId]);
 
   // Memoize existingFiles to prevent unnecessary re-renders
