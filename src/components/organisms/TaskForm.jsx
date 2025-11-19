@@ -5,14 +5,14 @@ import Input from "@/components/atoms/Input"
 import Select from "@/components/atoms/Select"
 import Textarea from "@/components/atoms/Textarea"
 import ApperIcon from "@/components/ApperIcon"
-
+import ApperFileFieldComponent from "@/components/atoms/FileUploader/ApperFileFieldComponent"
 const TaskForm = ({ onAddTask }) => {
-  const [title, setTitle] = useState("")
+const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [priority, setPriority] = useState("medium")
+  const [files, setFiles] = useState([])
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const validateForm = () => {
     const newErrors = {}
     
@@ -23,7 +23,7 @@ const TaskForm = ({ onAddTask }) => {
     return newErrors
   }
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
     
     const formErrors = validateForm()
@@ -34,19 +34,35 @@ const TaskForm = ({ onAddTask }) => {
     setIsSubmitting(true)
     
     try {
-await onAddTask({
+      // Get files from SDK if available
+      let attachmentFiles = [];
+      if (window.ApperSDK && window.ApperSDK.ApperFileUploader) {
+        try {
+          const fileField = document.getElementById(`file-uploader-task-attachment`);
+          if (fileField) {
+            // SDK handles file data internally
+            attachmentFiles = files;
+          }
+        } catch (fileError) {
+          console.error("Error getting files:", fileError);
+        }
+      }
+
+      await onAddTask({
         title_c: title.trim(),
         description_c: description.trim(),
         priority_c: priority,
         status_c: "active",
         createdAt_c: new Date().toISOString(),
-        completedAt_c: null
+        completedAt_c: null,
+        attachment_c: attachmentFiles.length > 0 ? attachmentFiles : null
       })
       
       // Reset form
       setTitle("")
       setDescription("")
       setPriority("medium")
+      setFiles([])
       setErrors({})
     } catch (error) {
       console.error("Error adding task:", error)
@@ -73,7 +89,7 @@ await onAddTask({
     }
   }
 
-  return (
+return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -148,6 +164,23 @@ await onAddTask({
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">
+              Attachments
+            </label>
+            <ApperFileFieldComponent
+              elementId="task-attachment"
+              config={{
+                fieldName: 'attachment_c',
+                fieldKey: 'attachment_c',
+                tableName: 'task_c',
+                apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+                apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
+                existingFiles: files,
+                fileCount: files.length
+              }}
+            />
+          </div>
           <div className="flex justify-end pt-4">
             <Button
               type="submit"

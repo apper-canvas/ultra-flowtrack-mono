@@ -1,7 +1,7 @@
 import { getApperClient } from "@/services/apperClient"
 
 export const taskService = {
-  async getAll() {
+async getAll() {
     try {
       const apperClient = getApperClient()
       const response = await apperClient.fetchRecords('task_c', {
@@ -11,7 +11,8 @@ export const taskService = {
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "status_c"}},
           {"field": {"Name": "createdAt_c"}},
-          {"field": {"Name": "completedAt_c"}}
+          {"field": {"Name": "completedAt_c"}},
+          {"field": {"Name": "attachment_c"}}
         ],
         orderBy: [{"fieldName": "createdAt_c", "sorttype": "DESC"}]
       })
@@ -28,7 +29,7 @@ export const taskService = {
     }
   },
 
-  async getById(id) {
+async getById(id) {
     try {
       const apperClient = getApperClient()
       const response = await apperClient.getRecordById('task_c', parseInt(id), {
@@ -38,7 +39,8 @@ export const taskService = {
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "status_c"}},
           {"field": {"Name": "createdAt_c"}},
-          {"field": {"Name": "completedAt_c"}}
+          {"field": {"Name": "completedAt_c"}},
+          {"field": {"Name": "attachment_c"}}
         ]
       })
 
@@ -54,7 +56,7 @@ export const taskService = {
     }
   },
 
-  async create(taskData) {
+async create(taskData) {
     try {
       const apperClient = getApperClient()
       const response = await apperClient.createRecord('task_c', {
@@ -64,7 +66,8 @@ export const taskService = {
           priority_c: taskData.priority_c,
           status_c: taskData.status_c,
           createdAt_c: taskData.createdAt_c,
-          completedAt_c: taskData.completedAt_c
+          completedAt_c: taskData.completedAt_c,
+          attachment_c: taskData.attachment_c
         }]
       })
 
